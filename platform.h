@@ -10,11 +10,14 @@
 #include <intrin.h>
 #define ALIGNSPEC(type,name,alignment) __declspec(align(alignment)) type name
 
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) && defined(__x86_64__)
 
 #include <x86intrin.h>
 #define ALIGNSPEC(type,name,alignment) type name __attribute__((aligned(alignment)))
 
+#elif defined(__GNUC__) && defined(__aarch64__)
+
+#include <arm_neon.h>
 #else
 #error Unknown compiler!
 #endif
@@ -61,4 +64,3 @@ static inline double timer()
 #endif
 
 #endif // PLATFORM_H_INCLUDED
-

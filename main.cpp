@@ -1,3 +1,12 @@
+#include <time.h>
+
+static inline uint64_t get_timestamp_counter()
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)ts.tv_sec * 1000000000L + ts.tv_nsec;
+}
+
 #include "platform.h"
 #include <stdio.h>
 #include <stdarg.h>
@@ -168,7 +177,7 @@ int main(int argc, char **argv)
     printf("rANS encode:\n");
     for (int run=0; run < 5; run++) {
         double start_time = timer();
-        uint64_t enc_start_time = __rdtsc();
+        uint64_t enc_start_time = get_timestamp_counter();
 
         RansState rans;
         RansEncInit(&rans);
@@ -181,7 +190,7 @@ int main(int argc, char **argv)
         RansEncFlush(&rans, &ptr);
         rans_begin = ptr;
 
-        uint64_t enc_clocks = __rdtsc() - enc_start_time;
+        uint64_t enc_clocks = get_timestamp_counter() - enc_start_time;
         double enc_time = timer() - start_time;
         printf("  %"PRIu64" clocks, %.1f clocks/symbol (%5.1fMiB/s)\n", enc_clocks, 1.0 * enc_clocks / in_size, 1.0 * in_size / (enc_time * 1048576.0));
     }
@@ -190,7 +199,7 @@ int main(int argc, char **argv)
     // try rANS decode
     for (int run=0; run < 5; run++) {
         double start_time = timer();
-        uint64_t dec_start_time = __rdtsc();
+        uint64_t dec_start_time = get_timestamp_counter();
 
         RansState rans;
         uint8_t* ptr = rans_begin;
@@ -202,7 +211,7 @@ int main(int argc, char **argv)
             RansDecAdvanceSymbol(&rans, &ptr, &dsyms[s], prob_bits);
         }
 
-        uint64_t dec_clocks = __rdtsc() - dec_start_time;
+        uint64_t dec_clocks = get_timestamp_counter() - dec_start_time;
         double dec_time = timer() - start_time;
         printf("  %"PRIu64" clocks, %.1f clocks/symbol (%5.1fMiB/s)\n", dec_clocks, 1.0 * dec_clocks / in_size, 1.0 * in_size / (dec_time * 1048576.0));
     }
@@ -221,7 +230,7 @@ int main(int argc, char **argv)
     printf("\ninterleaved rANS encode:\n");
     for (int run=0; run < 5; run++) {
         double start_time = timer();
-        uint64_t enc_start_time = __rdtsc();
+        uint64_t enc_start_time = get_timestamp_counter();
 
         RansState rans0, rans1;
         RansEncInit(&rans0);
@@ -245,7 +254,7 @@ int main(int argc, char **argv)
         RansEncFlush(&rans0, &ptr);
         rans_begin = ptr;
 
-        uint64_t enc_clocks = __rdtsc() - enc_start_time;
+        uint64_t enc_clocks = get_timestamp_counter() - enc_start_time;
         double enc_time = timer() - start_time;
         printf("  %"PRIu64" clocks, %.1f clocks/symbol (%5.1fMiB/s)\n", enc_clocks, 1.0 * enc_clocks / in_size, 1.0 * in_size / (enc_time * 1048576.0));
     }
@@ -254,7 +263,7 @@ int main(int argc, char **argv)
     // try interleaved rANS decode
     for (int run=0; run < 5; run++) {
         double start_time = timer();
-        uint64_t dec_start_time = __rdtsc();
+        uint64_t dec_start_time = get_timestamp_counter();
 
         RansState rans0, rans1;
         uint8_t* ptr = rans_begin;
@@ -279,7 +288,7 @@ int main(int argc, char **argv)
             RansDecAdvanceSymbol(&rans0, &ptr, &dsyms[s0], prob_bits);
         }
 
-        uint64_t dec_clocks = __rdtsc() - dec_start_time;
+        uint64_t dec_clocks = get_timestamp_counter() - dec_start_time;
         double dec_time = timer() - start_time;
         printf("  %"PRIu64" clocks, %.1f clocks/symbol (%5.1fMB/s)\n", dec_clocks, 1.0 * dec_clocks / in_size, 1.0 * in_size / (dec_time * 1048576.0));
     }
@@ -293,7 +302,7 @@ int main(int argc, char **argv)
 	printf("\n4-way interleaved rANS encode:\n");
     for (int run=0; run < 5; run++) {
         double start_time = timer();
-        uint64_t enc_start_time = __rdtsc();
+        uint64_t enc_start_time = get_timestamp_counter();
 
         // odd number of bytes?
 		RansState rans0, rans1, rans2, rans3;
@@ -330,7 +339,7 @@ int main(int argc, char **argv)
 		
         rans_begin = ptr;
 
-        uint64_t enc_clocks = __rdtsc() - enc_start_time;
+        uint64_t enc_clocks = get_timestamp_counter() - enc_start_time;
         double enc_time = timer() - start_time;
         printf("  %"PRIu64" clocks, %.1f clocks/symbol (%5.1fMiB/s)\n", enc_clocks, 1.0 * enc_clocks / in_size, 1.0 * in_size / (enc_time * 1048576.0));
     }
@@ -339,7 +348,7 @@ int main(int argc, char **argv)
     // try interleaved rANS decode
     for (int run=0; run < 5; run++) {
         double start_time = timer();
-        uint64_t dec_start_time = __rdtsc();
+        uint64_t dec_start_time = get_timestamp_counter();
 
         uint8_t* ptr = rans_begin;
 		
@@ -396,7 +405,7 @@ int main(int argc, char **argv)
 			break;
 		}
 
-        uint64_t dec_clocks = __rdtsc() - dec_start_time;
+        uint64_t dec_clocks = get_timestamp_counter() - dec_start_time;
         double dec_time = timer() - start_time;
         printf("  %"PRIu64" clocks, %.1f clocks/symbol (%5.1fMB/s)\n", dec_clocks, 1.0 * dec_clocks / in_size, 1.0 * in_size / (dec_time * 1048576.0));
     }
@@ -414,7 +423,7 @@ int main(int argc, char **argv)
 
     for (int run=0; run < 5; run++) {
         double start_time = timer();
-        uint64_t enc_start_time = __rdtsc();
+        uint64_t enc_start_time = get_timestamp_counter();
 
         RansState R[4];
         RansEncInit(&R[0]);
@@ -438,7 +447,7 @@ int main(int argc, char **argv)
         RansEncFlush(&R[0], &ptr);
         rans_begin = ptr;
 
-        uint64_t enc_clocks = __rdtsc() - enc_start_time;
+        uint64_t enc_clocks = get_timestamp_counter() - enc_start_time;
         double enc_time = timer() - start_time;
         printf("  %"PRIu64" clocks, %.1f clocks/symbol (%5.1fMiB/s)\n", enc_clocks, 1.0 * enc_clocks / in_size, 1.0 * in_size / (enc_time * 1048576.0));
     }
@@ -447,7 +456,7 @@ int main(int argc, char **argv)
     // try rANS decode
     for (int run=0; run < 5; run++) {
         double start_time = timer();
-        uint64_t dec_start_time = __rdtsc();
+        uint64_t dec_start_time = get_timestamp_counter();
 
         RansState R[4];
         uint8_t* ptr = rans_begin;
@@ -470,7 +479,7 @@ int main(int argc, char **argv)
 			R[3] = X;
         }
 
-        uint64_t dec_clocks = __rdtsc() - dec_start_time;
+        uint64_t dec_clocks = get_timestamp_counter() - dec_start_time;
         double dec_time = timer() - start_time;
         printf("  %"PRIu64" clocks, %.1f clocks/symbol (%5.1fMiB/s)\n", dec_clocks, 1.0 * dec_clocks / in_size, 1.0 * in_size / (dec_time * 1048576.0));
     }

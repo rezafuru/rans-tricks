@@ -2,7 +2,7 @@
 
 There are some adjusments I'd like to try to this algorithm for better integration but I cannot find the time for it. 
 
-If you are looking for a bachelor thesis or master's project at TU Vienna and you find this forked repository interesting, write me a mail: alireza.furutanpey@dsg.tuwien.ac.at
+If you are looking for a bachelor thesis or master's project at TU Vienna and you find this forked repository interesting, write me a mail: a.furutanpey@dsg.tuwien.ac.at
 
 # rans-tricks
 This repo contains a few branchless modifications to a traditional rans coder, as a result it's performance is comparable to FSE whilst supporting adaptive probabilities and using no platform specific intrinsics or assembly.
